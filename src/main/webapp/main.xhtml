@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+>
+
+<ui:include src="/layout/template.xhtml"/>
+
+<h:body>
+    <table class="body">
+        <tr>
+            <td class="graph">
+                <canvas id="coordinates"></canvas>
+            </td>
+            <td class="columnWithData">
+                <h:form id="form" styleClass="coordinates-form">
+                    <h5 class="label">X <span id="xCoordinate"></span></h5>
+
+                    <h:inputHidden id="x" value="#{point.x}"/>
+                    <p:slider for="x" display="x_out" minValue="-5" maxValue="5" step="1">
+                    </p:slider>
+                    <h:outputText id="x_out" value="#{point.x}"/>
+                    <h5 class="label">Y <span id="yCoordinate"></span></h5>
+                    <h:panelGrid columns="1">
+                        <p:inputNumber name="y" id="y" maxlength="10" value="#{point.y}" decimalSeparator=".">
+                            <f:validateDoubleRange minimum="-5" maximum="5"/>
+                        </p:inputNumber>
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="1">
+                        <p:selectOneRadio id="r" value="#{point.r}">
+                            <f:selectItem itemValue="1" itemLabel="1"/>
+                            <f:selectItem itemValue="2" itemLabel="2"/>
+                            <f:selectItem itemValue="3" itemLabel="3"/>
+                            <f:selectItem itemValue="4" itemLabel="4"/>
+                            <f:selectItem itemValue="5" itemLabel="5"/>
+                            <p:ajax update="redrawGraph redrawPoints"/>
+                        </p:selectOneRadio>
+                    </h:panelGrid>
+
+
+                    <p:commandButton ajax="true" id="submit" value="Отправить"
+                                     action="#{manager.addPointToTable(point)}"
+                                     update="@form result redrawPoints"/>
+                </h:form>
+            </td>
+            <td>
+                <div class="result_width">
+                    <div class="scroll">
+                        <p:dataTable styleClass="frontTables" id="result" value="#{pointsList}" var="item"
+                                     style="width: 100%; border-width:2px; margin: 0 auto; border-color:black; border-style:solid;">
+                            <p:column headerText="X">
+                                <h:outputText value="#{item.x}">
+                                    <f:convertNumber type="number"
+                                                     maxFractionDigits="3"
+                                                     groupingUsed="false"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Y">
+                                <h:outputText value="#{item.y}">
+                                    <f:convertNumber type="number"
+                                                     maxFractionDigits="3"
+                                                     groupingUsed="false"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="R">
+                                <h:outputText value="#{item.r}"/>
+                            </p:column>
+                            <p:column headerText="Результат">
+                                <h:outputText value="#{item.result ? 'Попал' : 'Не попал' }"/>
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <h:outputScript name="js/CoordinatePlane.js"/>
+</h:body>
+<h:panelGroup id="redrawGraph">
+    <h:outputScript>
+        window.redrawGraph(#{point.r});
+    </h:outputScript>
+</h:panelGroup>
+<h:panelGroup id="redrawPoints">
+    <h:outputScript>
+        window.redrawPoints();
+    </h:outputScript>
+</h:panelGroup>
+<p:remoteCommand name="addPoint" action="#{manager.addPointToTableFromJSON()}" update="result"
+                 process="@this" oncomplete=""/>
+</html>
