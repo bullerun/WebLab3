@@ -19,7 +19,7 @@ public class ManagerDB implements Serializable {
 
     static {
         try {
-            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/studs", "s368738", "XH9wjv2skRYOzgjX");
+            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/studs", "s368738", "password");
             connection.createStatement().execute("CREATE TABLE IF NOT EXISTS results (\n" +
                     "  id SERIAL PRIMARY KEY,\n" +
                     "  x FLOAT NOT NULL,\n" +
